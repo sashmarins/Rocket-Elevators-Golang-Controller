@@ -1,7 +1,5 @@
 package main
 
-import "math"
-
 type Battery struct {
 	ID                         int
 	_amountOfColumns           int
@@ -20,27 +18,27 @@ func NewBattery(_id, _amountOfColumns, _amountOfFloors, _amountOfBasements, _amo
 var columnID int = 1
 var floorRequestButtonID int = 1
 
-func createBasementColumn(_amountOfBasements int) *[]Column {
-	var columnsList []Column
+func createBasementColumn(_amountOfBasements int, _amountOfElevatorPerColumn int) *Column {
 	var servedFloors []int
 	var floor int = -1
 	for i := 0; i < _amountOfBasements; i++ {
 		servedFloors = append(servedFloors, floor)
 		floor--
 	}
-	columnsList = append(columnsList, *NewColumn(columnID, _amountOfBasements, servedFloors, true))
 	columnID++
-	return &columnsList
+	basementColumn := *NewColumn(columnID, _amountOfBasements, servedFloors, true)
+	return &basementColumn
 }
 
 func createColumns(_amountOfColumns int, _amountOfFloors int, _amountOfElevatorPerColumn int, _amountOfBasements int) *[]Column {
 	var columnsList []Column
-	var amountOfFloorsPerColumn int = int(math.Ceil(float64(_amountOfFloors) / float64(_amountOfColumns)))
+	// var amountOfFloorsPerColumn int = int(math.Ceil(float64(_amountOfFloors) / float64(_amountOfColumns)))
+	var amountOfFloorsPerColumn int = 20
 	var floor int = 1
-	// if _amountOfBasements > 0 {
-	// 	*createBasementColumn(_amountOfBasements)
-	// 	return &columnsList
-	// }
+	if _amountOfBasements > 0 {
+		columnsList = append(columnsList, *createBasementColumn(_amountOfBasements, _amountOfElevatorPerColumn))
+		_amountOfColumns--
+	}
 	for i := 0; i < _amountOfColumns; i++ {
 		var servedFloors []int
 		for h := 0; h < amountOfFloorsPerColumn; h++ {
@@ -49,13 +47,13 @@ func createColumns(_amountOfColumns int, _amountOfFloors int, _amountOfElevatorP
 				floor++
 			}
 		}
-		columnsList = append(columnsList, *NewColumn(columnID, _amountOfFloors, servedFloors, false))
 		columnID++
+		columnsList = append(columnsList, *NewColumn(columnID, _amountOfElevatorPerColumn, servedFloors, false))
 	}
-	if _amountOfBasements > 0 {
-		basementColumn := *createBasementColumn(_amountOfBasements)
-		return &basementColumn
-	}
+	// if _amountOfBasements > 0 {
+	// 	basementColumn := *createBasementColumn(_amountOfBasements)
+	// 	return &basementColumn
+	// }
 	return &columnsList
 }
 
